@@ -1,0 +1,17 @@
+pip
+wheel
+Django>=3.2.3
+djangorestframework>=3.12.4
+requests
+PyJWT<2.0.0
+bcrypt
+django-cors-headers
+dj-static>=0.0.6
+django-fullurl
+django-filter
+django-crontab
+pytz
+django-session-timeout
+djangorestframework-simplejwt
+netifaces>=0.11.0
+git+https://github.com/helviojunior/async_upnp_client
