@@ -11,7 +11,7 @@ A central VETTI detém um painel controlador que nada mais é do que um tablet c
 De forma simplificada e para atender o objetivo deste projeto foi entendido o seguinte comportamento:
 
 1. A comunicação com a central de alarme se dá através do protocolo UDP na porta 5000
-2. A comunicação é toda em texto claro com textos simples struturados
+2. A comunicação é toda em texto claro com textos simples estruturados
 
 ### Autenticação com a central
 

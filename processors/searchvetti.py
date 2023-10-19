@@ -79,9 +79,9 @@ class SearchVetti():
                         ip_addr=vetti['ip'],
                     )
                     Tools.send_telegram(text=(f"New Vetti central found: \n"
-                                              f"MAC:{vetti['mac']}"
-                                              f"IP:{vetti['ip']}"
-                                              f"Name:{vetti['name']}"))
+                                              f"MAC:{vetti['mac']}\n"
+                                              f"IP:{vetti['ip']}\n"
+                                              f"Name:{vetti['name']}\n"))
                 else:
                     # to update last search
                     save = central.updated <= datetime.datetime.now() - datetime.timedelta(minutes=5)
@@ -117,9 +117,19 @@ class SearchVetti():
         if vetti.armed:
             sock.sendto(f"[T134 CMDX Id=25 User={conf_settings.VETTI['user_password']} Part=100000]".encode(),
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
+
+            Tools.send_telegram(text=(f"Alarme acionado: \n"
+                                      f"MAC:{vetti['mac']}\n"
+                                      f"IP:{vetti['ip']}\n"
+                                      f"Name:{vetti['name']}\n"))
         else:
             sock.sendto(f"[T146 CMDX Id=22 User={conf_settings.VETTI['user_password']} Part=100000]".encode(),
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
+
+            Tools.send_telegram(text=(f"Alarme desligado: \n"
+                                      f"MAC:{vetti['mac']}\n"
+                                      f"IP:{vetti['ip']}\n"
+                                      f"Name:{vetti['name']}\n"))
 
     @staticmethod
     def search_vetti() -> list[dict]:
