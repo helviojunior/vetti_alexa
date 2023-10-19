@@ -119,17 +119,17 @@ class SearchVetti():
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
 
             Tools.send_telegram(text=(f"Alarme acionado: \n"
-                                      f"MAC:{vetti['mac']}\n"
-                                      f"IP:{vetti['ip']}\n"
-                                      f"Name:{vetti['name']}\n"))
+                                      f"MAC:{vetti.mac_addr}\n"
+                                      f"IP:{vetti.ip_addr}\n"
+                                      f"Name:{vetti.name}\n"))
         else:
             sock.sendto(f"[T146 CMDX Id=22 User={conf_settings.VETTI['user_password']} Part=100000]".encode(),
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
 
             Tools.send_telegram(text=(f"Alarme desligado: \n"
-                                      f"MAC:{vetti['mac']}\n"
-                                      f"IP:{vetti['ip']}\n"
-                                      f"Name:{vetti['name']}\n"))
+                                      f"MAC:{vetti.mac_addr}\n"
+                                      f"IP:{vetti.ip_addr}\n"
+                                      f"Name:{vetti.name}\n"))
 
     @staticmethod
     def search_vetti() -> list[dict]:
