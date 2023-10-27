@@ -57,6 +57,9 @@ class SearchVetti():
         try:
             self.do_check_vetti()
 
+            for central in Vetti.objects.filter(enabled=True):
+                self.do_check_status(central)
+
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             error = traceback.format_exception(exc_type, exc_value, exc_traceback)
@@ -67,6 +70,49 @@ class SearchVetti():
             logger.error(err_txt)
         finally:
             os.unlink(pidfile)
+
+    def do_check_status(self, vetti: Vetti):
+        AUTH = f"[T128 TEC Idx=401 Cmd=3 Par={conf_settings.VETTI['config_password']}]"
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+
+        sock.sendto(AUTH.encode(), (vetti.ip_addr, SearchVetti.UDP_PORT))
+        sock.recvfrom(1024)
+
+        # get actual status
+        sock.sendto(f"[T137 CMD 2]".encode(), (vetti.ip_addr, SearchVetti.UDP_PORT))
+        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
+
+        if isinstance(data, bytes):
+            data = data.decode("UTF-8")
+
+        m = re.search(r'\[R137.*p:([SAN-])', data, re.IGNORECASE)
+        if m is None:
+            return
+
+        st = m.group(1).upper()
+
+        if st in ("S", "A") and vetti.armed:
+            return
+
+        if st == "-" and vetti.armed:
+            vetti.armed = False
+            vetti.save()
+            Tools.send_telegram(text=(f"Alarme desligado via controle: \n"
+                                      f"MAC:{vetti.mac_display}\n"
+                                      f"IP:{vetti.ip_addr}\n"
+                                      f"Name:{vetti.name}\n"))
+            return
+
+        if st in ("S", "A") and not vetti.armed:
+            name = "stay" if st == "S" else "full"
+            vetti.armed = True
+            vetti.save()
+            Tools.send_telegram(text=(f"Alarme acionado {name} via controle: \n"
+                                      f"MAC:{vetti.mac_display}\n"
+                                      f"IP:{vetti.ip_addr}\n"
+                                      f"Name:{vetti.name}\n"))
+            return
 
     def do_check_vetti(self):
         for vetti in SearchVetti.search_vetti():
@@ -113,21 +159,22 @@ class SearchVetti():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
         sock.sendto(AUTH.encode(), (vetti.ip_addr, SearchVetti.UDP_PORT))
+        sock.recvfrom(1024)
 
         if vetti.armed:
             sock.sendto(f"[T134 CMDX Id=25 User={conf_settings.VETTI['user_password']} Part=100000]".encode(),
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
 
-            Tools.send_telegram(text=(f"Alarme acionado: \n"
-                                      f"MAC:{vetti.mac_addr}\n"
+            Tools.send_telegram(text=(f"Alarme acionado stay via alexa: \n"
+                                      f"MAC:{vetti.mac_display}\n"
                                       f"IP:{vetti.ip_addr}\n"
                                       f"Name:{vetti.name}\n"))
         else:
             sock.sendto(f"[T146 CMDX Id=22 User={conf_settings.VETTI['user_password']} Part=100000]".encode(),
                         (vetti.ip_addr, SearchVetti.UDP_PORT))
 
-            Tools.send_telegram(text=(f"Alarme desligado: \n"
-                                      f"MAC:{vetti.mac_addr}\n"
+            Tools.send_telegram(text=(f"Alarme desligado via alexa: \n"
+                                      f"MAC:{vetti.mac_display}\n"
                                       f"IP:{vetti.ip_addr}\n"
                                       f"Name:{vetti.name}\n"))
 

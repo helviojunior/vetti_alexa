@@ -26,4 +26,7 @@ class Vetti(Base):
 
     @property
     def mac_display(self):
-        return ':'.join([self.mac_addr[i:i+2] for i in range(0, len(self.mac_addr), 2)])
+        try:
+            return ':'.join([self.mac_addr[i:i+2] for i in range(0, len(self.mac_addr), 2)])
+        except:
+            return self.mac_addr
