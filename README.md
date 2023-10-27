@@ -36,7 +36,7 @@ Supondo que está sendo passado `User=01020304`
 - 01: é o índice do usuário na central
 - 020304: é a senha do usuário 01 na central
 
-#### Armar todos os setores
+#### Arme todos os setores
 
 ```
 # Arme Full
@@ -46,6 +46,7 @@ Supondo que está sendo passado `User=01020304`
 [R142 CMDX Id=21 User=01 PART=100000 Err=000000 Stat=AANNNN]
 ```
 
+#### Desarme todos os setores
 ```
 # Desarme
 [T146 CMDX Id=22 User=01020304 Part=100000]
@@ -54,6 +55,7 @@ Supondo que está sendo passado `User=01020304`
 [R146 CMDX Id=22 User=01 PART=100000 Err=000000 Stat=-ANNNN]
 ```
 
+#### Arme stay todos os setores
 ```
 # Arme Stay
 [T134 CMDX Id=25 User=01020304 Part=100000]
@@ -62,6 +64,7 @@ Supondo que está sendo passado `User=01020304`
 [R134 CMDX Id=25 User=01 PART=100000 Err=000000 Stat=SANNNN]
 ```
 
+#### Resgata a data e hora da central
 ```
 # Data e hora da central
 [T136 CMD 27]
@@ -70,6 +73,7 @@ Supondo que está sendo passado `User=01020304`
 [R136 CMD 27 "2023/01/27 12:10:02"]
 ```
 
+#### Status da conexão de rede da central
 ```
 # Status da conexão
 [T129 STAT 5]
@@ -78,6 +82,7 @@ Supondo que está sendo passado `User=01020304`
 [R129 STAT 5 CID=ethernet GSM=NI Time="2023/01/27 12:10:02" Serv1="empresa.seguranca.com.br" Serv2=""]
 ```
 
+#### Status do alarme
 ```
 # Status do alarme
 [T137 CMD 2]
@@ -85,6 +90,8 @@ Supondo que está sendo passado `User=01020304`
 # Resposta
 [R137 CMD 2 (p:SANNNN)]
 ```
+
+#### Interpretando os status
 
 **Nota:** Veja que nos comandos de armar, desarmar e status apresentam um campo com um texto similar ao `SANNNN`, que pela minha análise o primeiro campo indica o status das zonas, onde a primeira letra indica a primeira zona tendo os seguintes possíveis status:
 
@@ -595,3 +602,14 @@ Caso precise limpar o GIT server no servidor remoto basta executar os comandos a
 $ cd ~/vetti.git
 $ git branch -D master
 ```
+
+## Conectando o sistema na Amazon Alexa
+
+1. Abra o aplicativo da Alexa no Celular
+2. Vá em `Devices` 
+3. Vá em `Add Device`
+3. Selecione a opção `Other`
+4. Selecione a opção `Wi-Fi`
+5. Clique em `Discover Devices`
+
+Depois deste procedimento o seu novo dispositivo deverá aparecer na listagem de novos dispositivos da Alexa.
