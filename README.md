@@ -13,11 +13,16 @@ De forma simplificada e para atender o objetivo deste projeto foi entendido o se
 1. A comunicação com a central de alarme se dá através do protocolo UDP na porta 5000
 2. A comunicação é toda em texto claro com textos simples estruturados
 
+Toda a captura da comunicação entre o painel do teclado e minha central está salva no arquivo [vetti_alarme.pcap](samples/vetti_alarme.pcap). Para abrir este arquivo é necessário o software [Wireshark](https://www.wireshark.org/).
+
 ### Autenticação com a central
 
 ```
 # Auth central
-# [T128 TEC Idx=401 Cmd=3 Par=1234]
+[T128 TEC Idx=401 Cmd=3 Par=1234]
+
+# Resposta
+[R128 TEC Idx=401 Cmd=3 Par=1234]
 ```
 
 **Nota:** O parametro `1234` é a senha de admin da central
@@ -35,18 +40,57 @@ Supondo que está sendo passado `User=01020304`
 
 ```
 # Arme Full
-# [T142 CMDX Id=21 User=01020304 Part=100000]
+[T142 CMDX Id=21 User=01020304 Part=100000]
+
+# Resposta
+[R142 CMDX Id=21 User=01 PART=100000 Err=000000 Stat=AANNNN]
 ```
 
 ```
 # Desarme
-# [T146 CMDX Id=22 User=01020304 Part=100000]
+[T146 CMDX Id=22 User=01020304 Part=100000]
+
+# Resposta
+[R146 CMDX Id=22 User=01 PART=100000 Err=000000 Stat=-ANNNN]
 ```
 
 ```
 # Arme Stay
-# [T134 CMDX Id=25 User=01020304 Part=100000]
+[T134 CMDX Id=25 User=01020304 Part=100000]
+
+# Resposta
+[R134 CMDX Id=25 User=01 PART=100000 Err=000000 Stat=SANNNN]
 ```
+
+```
+# Data e hora da central
+[T136 CMD 27]
+
+# Resposta
+[R136 CMD 27 "2023/01/27 12:10:02"]
+```
+
+```
+# Status da conexão
+[T129 STAT 5]
+
+# Resposta
+[R129 STAT 5 CID=ethernet GSM=NI Time="2023/01/27 12:10:02" Serv1="empresa.seguranca.com.br" Serv2=""]
+```
+
+```
+# Status do alarme
+[T137 CMD 2]
+
+# Resposta
+[R137 CMD 2 (p:SANNNN)]
+```
+
+**Nota:** Veja que nos comandos de armar, desarmar e status apresentam um campo com um texto similar ao `SANNNN`, que pela minha análise o primeiro campo indica o status das zonas, onde a primeira letra indica a primeira zona tendo os seguintes possíveis status:
+
+- `A`: Acionado Full
+- `S`: Acionado Stay
+- `-`: Desligado
 
 ## Preparação do servidor
 
